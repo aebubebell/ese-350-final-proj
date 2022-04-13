@@ -1,211 +1,194 @@
-typedef struct gameBoard {
-//x and y midpt pos of paddle
-int x,y;
-//vertical velocity of paddle
-int vy;
-} paddle;
-
-static void reset(){
-  int i,j;
-  //draw board
-  for(i = 0; i < 20; i++){
-    for(j = 5; j < 20; j++){
-      LCD_drawBlock(i,j,i+5,j+5,black);
-    }
-  }
-    
-   int board[6][6];
-   int numTurns = 0;
-   static boolean player1 = true;
-   static gameOver = false;
-   int x[6][7];
+#include <avr/io.h>
+#define F_CPU 16000000UL
 
 
+#define F_CPU 16000000UL
+#define BAUD_RATE 9600
+#define BAUD_PRESCALER (((F_CPU / (BAUD_RATE * 16UL))) - 1)
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
+//#include "connectFour.c"
+
+volatile int isRising = 1;
+volatile int pulseStart = 0;
+volatile int pulseEnd = 0;
+volatile int tickCount = 0;
+int overflowCount = 0;
+int ballCount = 0;
+int playerTurn = 1; 
+int cm = 0; 
+char String[25];
+
+void Initialize(){
+	cli();
+	//input pins for IR sensors 
+	DDRB &= ~(1<<DDB1);
+	DDRB &= ~(1<<DDB2);
+	DDRB &= ~(1<<DDB3);
+	DDRB &= ~(1<<DDB4);
+	DDRB &= ~(1<<DDB5);
+	//setting them all high initially (comment out later) 
+	PORTB |= (1<<PORTB1);
+	PORTB |= (1<<PORTB2);
+	PORTB |= (1<<PORTB3);
+	PORTB |= (1<<PORTB4);
+	PORTB |= (1<<PORTB5);
+	
+	
+	
+	DDRD |= (1<<DDD6); //set PD6 as output pin for trigger signal
+	DDRB &= ~(1<<DDB0); //set PB0 as input pin for echo signal
+	
+	//set timer 1 to Normal Mode
+	TCCR1A &= ~(1<<WGM10);
+	TCCR1A &= ~(1<<WGM11);
+	TCCR1A &= ~(1<<WGM12);
+	TCCR1A &= ~(1<<WGM13);
+	
+	//prescaler timer 1 by 64
+	TCCR1B |= (1<<CS10);
+	TCCR1B |= (1<<CS11);
+	TCCR1B &= ~(1<<CS12);
+	
+	TIMSK1 |= (1<<TOIE1); //enable overflow interrupt
+	TIMSK1 |= (1<<ICIE1); //enable input capture interrupt
+	TCCR1B |= (1<ICES1); //enable interrupt to look for rising edge
+	
+	TIFR1 |= (1<<ICF1);
+	TIFR1 |= (1<<TOV1);
+	
+	
+	
+	sei();
+}
+
+void UART_init(void){
+	//set baud rate
+	UBRR0H = (unsigned char)(BAUD_PRESCALER>>8);
+	UBRR0L = (unsigned char)BAUD_PRESCALER;
+	
+	UCSR0C |= (1<<USBS0); //2 stop bits
+	UCSR0C = (1<<UCSZ01) | (1<<UCSZ00); //8 bits for data
+	
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //this enables reader and writer
+	
+}
+void UART_send(unsigned char data){
+	while(!(UCSR0A & (1<<UDRE0)));
+	UDR0 = data;
+}
+void UART_putstring(char* StringToUse){
+	while(*StringToUse != 0b00000000){
+		UART_send(*StringToUse);
+		StringToUse++;
+	}
+}
+
+/*
+int main(void){
+	reset();
+	board[0][0] = 1; //not letting me access the board from the other file 
+	board[0][0] = 1;
+	board[0][0] = 1;
+	board[0][0] = 1;
+	
+} */ 
+
+int main(void)
+{
+	UART_init();
+	sprintf(String, "Hello \n");
+	UART_putstring(String);
+	Initialize();
+	sprintf(String, "Player 1's Turn! \n");
+	UART_putstring(String);
+	while (1)
+	{
+		
+		
+		 if(!(PINB & (1<<PINB1))){
+			 _delay_ms(400);
+			 ballCount++;
+			sprintf(String, "Ball scored in column 1 \n");
+			UART_putstring(String);
+		}
+		
+		else if(!(PINB & (1<<PINB2))){
+			_delay_ms(400);
+			ballCount++;
+			sprintf(String, "Ball scored in column 2 \n");
+			UART_putstring(String);
+		}
+		else if(!(PINB & (1<<PINB3))){
+			_delay_ms(400);
+			ballCount++;
+			sprintf(String, "Ball scored in column 3 \n");
+			UART_putstring(String);
+		}
+		else if(!(PINB & (1<<PINB4))){
+			_delay_ms(400);
+			ballCount++;
+			sprintf(String, "Ball scored in column 4 \n");
+			UART_putstring(String);
+		}
+		else if(!(PINB & (1<<PINB5))){
+			_delay_ms(400);
+			ballCount++;
+			sprintf(String, "Ball scored in column 5 \n");
+			UART_putstring(String);
+		}
+		
+		if(ballCount == 2){
+			ballCount = 0; 
+			if(playerTurn == 1){
+				playerTurn = 2;
+				sprintf(String, "Player 2's Turn! \n");
+				UART_putstring(String);
+			}
+			else if(playerTurn == 2){
+				playerTurn = 1; 
+				sprintf(String, "Player 1's Turn! \n");
+				UART_putstring(String);
+			}
+		}
+	//	sprintf(String, "Distance in cm: %u \n", cm);
+	//	UART_putstring(String);
+	}
+	
+}
+
+
+ISR(TIMER1_CAPT_vect){
+	
+	if (isRising){
+		pulseStart = ICR1;
+		isRising = 0;
+		TCCR1B &= ~(1<<ICES1); //look for falling edge now
+		overflowCount = 0;
+	}
+	else if (isRising == 0){
+		pulseEnd = ICR1;
+		isRising = 1;
+		TCCR1B |= (1<<ICES1);
+		tickCount = pulseEnd - pulseStart;
+	    cm = ((tickCount + 65535*overflowCount) * 4)/ 58;
+//		sprintf(String, "Distance in cm: %u \n", cm);
+//		UART_putstring(String);
+		overflowCount = 0;
+	}
+	
+}
+ISR(TIMER1_OVF_vect){
+
+	overflowCount++;
+	PORTD |= (1<<PORTD6);
+	_delay_us(20);
+	PORTD &= ~(1<<PORTD6);
 
 }
-/**
-     * getCurrentPlayer is a getter for the player
-     * whose turn it is in the game.
-     * 
-     * @return true if it's Player 1's turn,
-     * false if it's Player 2's turn.
-     */
-     boolean getCurrentPlayer() {
-        return player1;
-    }
-    
-    /**
-     * getCell is a getter for the contents of the
-     * cell specified by the method arguments.
-     * 
-     * @param c column to retrieve
-     * @param r row to retrieve
-     * @return an integer denoting the contents
-     *         of the corresponding cell on the 
-     *         game board.  0 = empty, 1 = Player 1,
-     *         2 = Player 2
-     */
-     int getCell(int c, int r) {
-        return board[r][c];
-    }
-   int getNumTurns() {
-        return numTurns;
-        
-    }
- boolean getGameOver() {
-        return gameOver;
-        
-    }
-    
-     void setGameOver(boolean x) {
-        gameOver = x;
-    }
-
-
-    /**
-     * playTurn allows players to play a turn. Returns true 
-     * if the move is successful and false if a player tries
-     * to play in a location that is taken or after the game
-     * has ended. If the turn is successful and the game has 
-     * not ended, the player is changed. If the turn is 
-     * unsuccessful or the game has ended, the player is not 
-     * changed.
-     * 
-     * 
-     * param- c column to play in
-     * param- r row to play in
-     * return whether the turn was successful
-     */
-    
-    //drops the chip in and stacks them 
-     boolean playTurn(int c) {
-        if (board[0][c] != 0 || gameOver) {
-            return false;
-        }
-
-        if (player1) {
-           int row,col;
-            for (row = sizeof(board) - 1; row >= 0; row--) {
-                if (board[row][c] == 0) {
-                    board[row][c] = 1;
-                    break;
-                }
-            }
-         
-        } else {
-          int row,col;
-            for ( row = sizeof(board) - 1; row >= 0; row--) {
-                if (board[row][c] == 0) {
-                    board[row][c] = 2;
-                    break;
-                }
-            }
-           
-        }
-        
-        int x [6][7];
-        int row,col;
-        for ( row = 0; row < 6; row++) {
-            for ( col = 0; col < 7; col++) {
-                x[row][col] = board[row][col];
-            }
-        }
-
-        numTurns++;
-        if (checkWinner() == 0) {
-            player1 = !player1;
-        }
-       
-        //storedState.add(numTurns, x);
-        return true;
-    }
-
-    /**
-     * checkWinner checks whether the game has reached a win 
-     * condition. checkWinner only looks for horizontal wins.
-     * 
-     * @return 0 if nobody has won yet, 1 if player 1 has won, and
-     *            2 if player 2 has won, 3 if the game hits stalemate
-     */
-    public int checkWinner() {
-       int row,col;
-         //Check horizontal win
-        for ( row = 0; row < sizeof(board); row++) {
-            for ( col = 0;col < sizeof(board[0]) - 3;col++) {
-                if (board[row][col] != 0 && board[row][col] == board[row][col + 1] && 
-                    board[row][col] == board[row][col + 2] &&
-                    board[row][col] == board[row][col + 3]) {
-                    gameOver = true;
-                    if (player1) {
-                        return 1;
-                    } else {
-                        return 2;
-                    }
-                }
-            }           
-        } 
-        
-        //check vertical
-        for ( row = 0; row < sizeof(board) - 3; row++) {
-            for ( col = 0;col < sizeof(board[0]);col++) {
-                if (board[row][col] != 0 && 
-                    board[row + 1][col] == board[row][col] && 
-                    board[row + 2][col] == board[row][col] &&
-                    board[row + 3][col] == board[row][col]) {
-                    gameOver = true;
-                    if (player1) {
-                        return 1;
-                    } else {
-                        return 2;
-                    }
-                }
-            }           
-        } 
-        
-        
-        //check diagonal downward win
-        for (int row = 0; row < sizeof(board) - 3; row++) {
-            for (int col = 0; col < sizeof(board[0]) - 3; col++) {
-                if (board[row][col] != 0 && 
-                    board[row][col] == board[row + 1][col + 1] 
-                            && 
-                    board[row + 1][col + 1] == board[row + 2][col + 2] &&
-                    board[row + 2][col + 2] == board[row + 3][col + 3] 
-                    ) {
-                    gameOver = true;
-                    if (player1) {
-                        return 1;
-                    } else {
-                        return 2;
-                    }
-                }
-            }
-        }
-        
-      //check upward diagonal
-        for (int row = 3; row < sizeof(board); row++) {
-            for (int col = 0; col < sizeof(board[0]) - 3; col++) {
-                if (board[row][col] != 0 && 
-                    board[row][col] == board[row - 1][col + 1] && 
-                    board[row - 1][col + 1] == board[row - 2][col + 2] &&
-                    board[row - 2][col + 2] == board[row - 3][col + 3]) {         
-                    gameOver = true;
-                    if (player1) {
-                        return 1;
-                    } else {
-                        return 2;
-                    }
-                }
-            }
-        }
-        
-       
-
-        
-        if (numTurns >= 42) {
-            gameOver = true;
-            return 3;
-        } else {
-            return 0;
-        }
-    } 
+ 
