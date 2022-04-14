@@ -13,12 +13,14 @@
 
 int board[6][6]; 
 int numTurns = 0; 
+int player1Turns = 0;
+int player2Turns = 0; 
 int player1 = 1; 
 int player2 = 0; 
 int gameOver = 0;
 //int x[6][7];
 
-static void reset(){
+void reset(){
   int i,j;
   //draw board
   for(i = 0; i < 5; i++){
@@ -26,10 +28,24 @@ static void reset(){
 		board[i][j] = 0;  
     }
   }
+  }
   //add random mines on the board, if a ball lands in this slot then it switches to the opposing teams color 
   //also need to implement bonus ball feature if player throws from far enough   
 
+
+void placeMines(int numMines){
+	int minesUsed = 0; 
+	while(numMines < minesUsed){
+		int row = rand() % (5 + 1 - 0) + 0;
+		int col = rand() % (5 + 1 - 0) + 0;
+		if(board[row][col] == 0){
+			board[row][col] = 4;
+			minesUsed++;
+		}
+	}
 }
+
+
 /*
       getCurrentPlayer is a getter for the player
       whose turn it is in the game.
@@ -67,6 +83,10 @@ static void reset(){
  void setGameOver(int x) {
         gameOver = x;
     }
+	
+int setCell(int r, int c, int val){
+	board[r][c] = val; 
+}
 
 
     /*
