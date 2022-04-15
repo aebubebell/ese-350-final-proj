@@ -99,50 +99,126 @@ int main(void){
 	
 } */ 
 
+/*
+int main(void){
+	UART_init();
+	reset(); 
+	setCell(4,0,1); 
+	setCell(3,1,1); 
+	setCell(2,2,1); 
+	setCell(1,3,1); 
+	int win = checkWinner();
+	sprintf(String, " Win: %u ", win);
+	UART_putstring(String);
+}
+*/ 
+
 int main(void)
 {
 	UART_init();
 	sprintf(String, "Hello \n");
 	UART_putstring(String);
 	Initialize();
+	reset(); 
 	sprintf(String, "Player 1's Turn! \n");
 	UART_putstring(String);
 	while (1)
 	{
 		
-		
 		 if(!(PINB & (1<<PINB1))){
 			 _delay_ms(400);
-			 ballCount++;
-			sprintf(String, "Ball scored in column 1 \n");
-			UART_putstring(String);
+			 if(playTurn(0)==1){
+				 sprintf(String, "Ball scored in column 1 ");
+				 UART_putstring(String);
+				// int gameOver = getGameOver(); 
+				
+				 int curr = getCurrentPlayer(); 
+				 sprintf(String, " Current Player: %u ", curr);
+				 UART_putstring(String);
+				 // sprintf(String, " Game Over: %u ", gameOver);
+				 // UART_putstring(String);
+				 int win = checkWinner();
+				 if(win>0){
+					 sprintf(String, " Win: %u ", win);
+					 UART_putstring(String);
+				 }
+				 /*
+				 if(getCurrentPlayer() == 1){
+					 sprintf(String, "by Player 1 \n");
+					 UART_putstring(String);
+				 }
+				 else{
+					 sprintf(String, "by Player 2 \n");
+					 UART_putstring(String);
+				 }
+				 */ 
+				 ballCount++;
+			 }
+			 else{
+				 sprintf(String, "Unsuccessful move \n");
+				 UART_putstring(String);
+			 } 
+			
 		}
 		
 		else if(!(PINB & (1<<PINB2))){
 			_delay_ms(400);
-			ballCount++;
-			sprintf(String, "Ball scored in column 2 \n");
-			UART_putstring(String);
+			if(playTurn(1)==1){
+				sprintf(String, "Ball scored in column 2 \n");
+				UART_putstring(String);
+				int curr = getCurrentPlayer();
+				sprintf(String, " Current Player: %u ", curr);
+				UART_putstring(String);
+				int win = checkWinner();
+				if(win>0){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+				}
+				ballCount++;
+			}
+			else{
+				sprintf(String, "Unsuccessful move \n");
+				UART_putstring(String);
+			}
 		}
+		 
 		else if(!(PINB & (1<<PINB3))){
 			_delay_ms(400);
-			ballCount++;
-			sprintf(String, "Ball scored in column 3 \n");
-			UART_putstring(String);
+			if(playTurn(2)==1){
+				sprintf(String, "Ball scored in column 3 \n");
+				UART_putstring(String);
+				ballCount++;
+			}
+			else{
+				sprintf(String, "Unsuccessful move \n");
+				UART_putstring(String);
+			}
 		}
 		else if(!(PINB & (1<<PINB4))){
 			_delay_ms(400);
-			ballCount++;
-			sprintf(String, "Ball scored in column 4 \n");
-			UART_putstring(String);
+			if(playTurn(3)==1){
+				sprintf(String, "Ball scored in column 4 \n");
+				UART_putstring(String);
+				ballCount++;
+			}
+			else{
+				sprintf(String, "Unsuccessful move \n");
+				UART_putstring(String);
+			}
 		}
 		else if(!(PINB & (1<<PINB5))){
 			_delay_ms(400);
-			ballCount++;
-			sprintf(String, "Ball scored in column 5 \n");
-			UART_putstring(String);
+			if(playTurn(4)==1){
+				sprintf(String, "Ball scored in column 5 \n");
+				UART_putstring(String);
+				ballCount++;
+			}
+			else{
+				sprintf(String, "Unsuccessful move \n");
+				UART_putstring(String);
+			}
 		}
-		
+	/*	
 		if(ballCount == 2){
 			ballCount = 0; 
 			if(playerTurn == 1){
@@ -156,12 +232,15 @@ int main(void)
 				UART_putstring(String);
 			}
 		}
+		*/ 
+		
+		
 	//	sprintf(String, "Distance in cm: %u \n", cm);
 	//	UART_putstring(String);
 	}
 	
 }
-
+ 
 
 ISR(TIMER1_CAPT_vect){
 	

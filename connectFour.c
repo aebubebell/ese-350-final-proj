@@ -11,12 +11,12 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-int board[6][6]; 
+int board[5][5]; 
 int numTurns = 0; 
 int player1Turns = 0;
 int player2Turns = 0; 
 int player1 = 1; 
-int player2 = 0; 
+//int player2 = 0; 
 int gameOver = 0;
 //int x[6][7];
 
@@ -110,7 +110,7 @@ int setCell(int r, int c, int val){
             return 0;
         }
 
-        if (player1) {
+        if (player1 == 1) {
            int row,col;
             for (row = sizeof(board) - 1; row >= 0; row--) {
                 if (board[row][c] == 0) {
@@ -129,7 +129,7 @@ int setCell(int r, int c, int val){
             }
            
         }
-        
+        /*
         int x [6][7];
         int row,col;
         for ( row = 0; row < 6; row++) {
@@ -137,10 +137,15 @@ int setCell(int r, int c, int val){
                 x[row][col] = board[row][col];
             }
         }
-
+*/ 
         numTurns++;
         if (checkWinner() == 0) {
-            player1 = !player1;
+            if(player1 == 1){
+				player1 = 0;
+			}
+			else{
+				player1 = 1;
+			}
         }
        
         //storedState.add(numTurns, x);
