@@ -6,6 +6,8 @@
 #define BAUD_RATE 9600
 #define BAUD_PRESCALER (((F_CPU / (BAUD_RATE * 16UL))) - 1)
 
+#include "lib\ST7735.h"
+#include "lib\LCD_GFX.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,18 +28,19 @@ char String[25];
 
 void Initialize(){
 	cli();
+	lcd_init();
 	//input pins for IR sensors 
-	DDRB &= ~(1<<DDB1);
-	DDRB &= ~(1<<DDB2);
-	DDRB &= ~(1<<DDB3);
-	DDRB &= ~(1<<DDB4);
-	DDRB &= ~(1<<DDB5);
+	DDRD &= ~(1<<DDD2);
+	DDRD &= ~(1<<DDD3);
+	DDRD &= ~(1<<DDD4);
+	DDRD &= ~(1<<DDD5);
+	DDRD &= ~(1<<DDD7);
 	//setting them all high initially (comment out later) 
-	PORTB |= (1<<PORTB1);
-	PORTB |= (1<<PORTB2);
-	PORTB |= (1<<PORTB3);
-	PORTB |= (1<<PORTB4);
-	PORTB |= (1<<PORTB5);
+	PORTD |= (1<<PORTD2);
+	PORTD |= (1<<PORTD3);
+	PORTD |= (1<<PORTD4);
+	PORTD |= (1<<PORTD5);
+	PORTD |= (1<<PORTD7);
 	
 	
 	
@@ -113,6 +116,15 @@ int main(void){
 }
 */ 
 
+
+int main(void){
+	UART_init();
+	Initialize();
+	reset(); 
+	LCD_setScreen(0); 
+}
+
+/*
 int main(void)
 {
 	UART_init();
@@ -122,10 +134,11 @@ int main(void)
 	reset(); 
 	sprintf(String, "Player 1's Turn! \n");
 	UART_putstring(String);
+	LCD_setScreen(0); 
 	while (1)
 	{
 		
-		 if(!(PINB & (1<<PINB1))){
+		 if(!(PIND & (1<<PIND7))){
 			 _delay_ms(400);
 			 if(playTurn(0)==1){
 				 sprintf(String, "Ball scored in column 1 ");
@@ -142,17 +155,9 @@ int main(void)
 					 sprintf(String, " Win: %u ", win);
 					 UART_putstring(String);
 				 }
-				 /*
-				 if(getCurrentPlayer() == 1){
-					 sprintf(String, "by Player 1 \n");
-					 UART_putstring(String);
-				 }
-				 else{
-					 sprintf(String, "by Player 2 \n");
-					 UART_putstring(String);
-				 }
-				 */ 
 				 ballCount++;
+				 LCD_setScreen(0); 
+				 drawBoard(); 
 			 }
 			 else{
 				 sprintf(String, "Unsuccessful move \n");
@@ -161,7 +166,7 @@ int main(void)
 			
 		}
 		
-		else if(!(PINB & (1<<PINB2))){
+		else if(!(PIND & (1<<PIND2))){
 			_delay_ms(400);
 			if(playTurn(1)==1){
 				sprintf(String, "Ball scored in column 2 \n");
@@ -174,6 +179,8 @@ int main(void)
 					sprintf(String, " Win: %u ", win);
 					UART_putstring(String);
 				}
+				LCD_setScreen(0); 
+				drawBoard(); 
 				ballCount++;
 			}
 			else{
@@ -182,57 +189,64 @@ int main(void)
 			}
 		}
 		 
-		else if(!(PINB & (1<<PINB3))){
+		else if(!(PIND & (1<<PIND3))){
 			_delay_ms(400);
 			if(playTurn(2)==1){
 				sprintf(String, "Ball scored in column 3 \n");
 				UART_putstring(String);
 				ballCount++;
+				LCD_setScreen(0); 
+				drawBoard(); 
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
 				UART_putstring(String);
 			}
 		}
-		else if(!(PINB & (1<<PINB4))){
+		else if(!(PIND & (1<<PIND4))){
 			_delay_ms(400);
 			if(playTurn(3)==1){
 				sprintf(String, "Ball scored in column 4 \n");
 				UART_putstring(String);
 				ballCount++;
+				LCD_setScreen(0); 
+				drawBoard(); 
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
 				UART_putstring(String);
 			}
 		}
-		else if(!(PINB & (1<<PINB5))){
+		else if(!(PIND & (1<<PIND5))){
 			_delay_ms(400);
 			if(playTurn(4)==1){
 				sprintf(String, "Ball scored in column 5 \n");
 				UART_putstring(String);
 				ballCount++;
+				LCD_setScreen(0); 
+				drawBoard(); 
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
 				UART_putstring(String);
+				drawBoard(); 
 			}
 		}
-	/*	
-		if(ballCount == 2){
-			ballCount = 0; 
-			if(playerTurn == 1){
-				playerTurn = 2;
-				sprintf(String, "Player 2's Turn! \n");
-				UART_putstring(String);
-			}
-			else if(playerTurn == 2){
-				playerTurn = 1; 
-				sprintf(String, "Player 1's Turn! \n");
-				UART_putstring(String);
-			}
-		}
-		*/ 
+		
+//		if(ballCount == 2){
+//			ballCount = 0; 
+//			if(playerTurn == 1){
+//				playerTurn = 2;
+//				sprintf(String, "Player 2's Turn! \n");
+//				UART_putstring(String);
+//			}
+//			else if(playerTurn == 2){
+//				playerTurn = 1; 
+//				sprintf(String, "Player 1's Turn! \n");
+//				UART_putstring(String);
+//			}
+//		}
+		
 		
 		
 	//	sprintf(String, "Distance in cm: %u \n", cm);
@@ -241,7 +255,7 @@ int main(void)
 	
 }
  
-
+*/ 
 ISR(TIMER1_CAPT_vect){
 	
 	if (isRising){

@@ -11,6 +11,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
+
 int board[5][5]; 
 int numTurns = 0; 
 int player1Turns = 0;
@@ -28,6 +29,7 @@ void reset(){
 		board[i][j] = 0;  
     }
   }
+
   }
   //add random mines on the board, if a ball lands in this slot then it switches to the opposing teams color 
   //also need to implement bonus ball feature if player throws from far enough   
@@ -242,3 +244,17 @@ int setCell(int r, int c, int val){
         }
 		}
 		
+		void drawBoard(){
+			for(int row = 0; row < 5; row++){
+				for(int col = 0; col < 5; col++){
+					if(board[row][col] == 1){
+						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 65535);
+					}
+					else if(board[row][col] == 2){
+						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 25000);
+					}
+				}
+			}
+			
+			
+		}
