@@ -9,6 +9,7 @@
 #include "lib\ST7735.h"
 #include "lib\LCD_GFX.h"
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <avr/io.h>
@@ -28,7 +29,7 @@ char String[25];
 
 void Initialize(){
 	cli();
-	lcd_init();
+	
 	//input pins for IR sensors 
 	DDRD &= ~(1<<DDD2);
 	DDRD &= ~(1<<DDD3);
@@ -65,9 +66,12 @@ void Initialize(){
 	TIFR1 |= (1<<ICF1);
 	TIFR1 |= (1<<TOV1);
 	
-	
+//	lcd_init();
+//	LCD_drawBlock(0,0,159,127,0);
+//	LCD_drawCircle(20,20,5,65535);
 	
 	sei();
+	 
 }
 
 void UART_init(void){
@@ -116,25 +120,32 @@ int main(void){
 }
 */ 
 
-
+/*
 int main(void){
 	UART_init();
 	Initialize();
 	reset(); 
-	LCD_setScreen(0); 
+	lcd_init();
+	LCD_drawBlock(0,0,159,127,0);
+	LCD_drawCircle(20,20,5,65535);
+//	LCD_drawCircle(40,40,10,0);
+	
 }
+*/
 
-/*
 int main(void)
 {
 	UART_init();
 	sprintf(String, "Hello \n");
 	UART_putstring(String);
 	Initialize();
+	lcd_init();
 	reset(); 
+	LCD_drawBlock(0,0,159,127,0);
+	//LCD_drawCircle(20,20,5,65535);
 	sprintf(String, "Player 1's Turn! \n");
 	UART_putstring(String);
-	LCD_setScreen(0); 
+//	LCD_setScreen(0); 
 	while (1)
 	{
 		
@@ -156,8 +167,9 @@ int main(void)
 					 UART_putstring(String);
 				 }
 				 ballCount++;
-				 LCD_setScreen(0); 
+				// LCD_setScreen(0); 
 				 drawBoard(); 
+			//	LCD_drawCircle(10,10,5,65535);
 			 }
 			 else{
 				 sprintf(String, "Unsuccessful move \n");
@@ -179,8 +191,9 @@ int main(void)
 					sprintf(String, " Win: %u ", win);
 					UART_putstring(String);
 				}
-				LCD_setScreen(0); 
+				//LCD_setScreen(0); 
 				drawBoard(); 
+				//LCD_drawCircle(20,20,5,65535);
 				ballCount++;
 			}
 			else{
@@ -195,8 +208,9 @@ int main(void)
 				sprintf(String, "Ball scored in column 3 \n");
 				UART_putstring(String);
 				ballCount++;
-				LCD_setScreen(0); 
+				//LCD_setScreen(0); 
 				drawBoard(); 
+				//LCD_drawCircle(30,30,5,65535);
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -209,8 +223,9 @@ int main(void)
 				sprintf(String, "Ball scored in column 4 \n");
 				UART_putstring(String);
 				ballCount++;
-				LCD_setScreen(0); 
+				//LCD_setScreen(0); 
 				drawBoard(); 
+				//LCD_drawCircle(40,40,5,65535);
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -223,13 +238,14 @@ int main(void)
 				sprintf(String, "Ball scored in column 5 \n");
 				UART_putstring(String);
 				ballCount++;
-				LCD_setScreen(0); 
+				//LCD_setScreen(0); 
 				drawBoard(); 
+				//LCD_drawCircle(50,50,5,65535);
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
 				UART_putstring(String);
-				drawBoard(); 
+				
 			}
 		}
 		
@@ -255,7 +271,7 @@ int main(void)
 	
 }
  
-*/ 
+ 
 ISR(TIMER1_CAPT_vect){
 	
 	if (isRising){
@@ -284,4 +300,3 @@ ISR(TIMER1_OVF_vect){
 	PORTD &= ~(1<<PORTD6);
 
 }
- 
