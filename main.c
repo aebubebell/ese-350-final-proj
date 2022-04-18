@@ -44,9 +44,9 @@ void Initialize(){
 	PORTD |= (1<<PORTD7);
 	
 	
-	
 	DDRD |= (1<<DDD6); //set PD6 as output pin for trigger signal
 	DDRB &= ~(1<<DDB0); //set PB0 as input pin for echo signal
+
 	
 	//set timer 1 to Normal Mode
 	TCCR1A &= ~(1<<WGM10);
@@ -141,7 +141,7 @@ int main(void)
 	Initialize();
 	lcd_init();
 	reset(); 
-	LCD_drawBlock(0,0,159,127,0);
+	LCD_drawBlock(0,0,159,200,0);
 	//LCD_drawCircle(20,20,5,65535);
 	sprintf(String, "Player 1's Turn! \n");
 	UART_putstring(String);
@@ -161,14 +161,16 @@ int main(void)
 				 UART_putstring(String);
 				 // sprintf(String, " Game Over: %u ", gameOver);
 				 // UART_putstring(String);
+				 
+				 ballCount++;
+				// LCD_setScreen(0); 
+				 drawBoard(); 
 				 int win = checkWinner();
 				 if(win>0){
 					 sprintf(String, " Win: %u ", win);
 					 UART_putstring(String);
+					 LCD_drawString(40,110, "Winner",65535,0);
 				 }
-				 ballCount++;
-				// LCD_setScreen(0); 
-				 drawBoard(); 
 			//	LCD_drawCircle(10,10,5,65535);
 			 }
 			 else{
@@ -186,15 +188,17 @@ int main(void)
 				int curr = getCurrentPlayer();
 				sprintf(String, " Current Player: %u ", curr);
 				UART_putstring(String);
-				int win = checkWinner();
-				if(win>0){
-					sprintf(String, " Win: %u ", win);
-					UART_putstring(String);
-				}
+			
 				//LCD_setScreen(0); 
 				drawBoard(); 
 				//LCD_drawCircle(20,20,5,65535);
 				ballCount++;
+				int win = checkWinner();
+				if(win>0){
+					 sprintf(String, " Win: %u ", win);
+					 UART_putstring(String);
+					 LCD_drawString(40,110, "Winner",65535,0);
+				 }
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -211,6 +215,12 @@ int main(void)
 				//LCD_setScreen(0); 
 				drawBoard(); 
 				//LCD_drawCircle(30,30,5,65535);
+				int win = checkWinner();
+				if(win>0){
+					 sprintf(String, " Win: %u ", win);
+					 UART_putstring(String);
+					 LCD_drawString(40,110, "Winner",65535,0);
+				 }
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -225,6 +235,12 @@ int main(void)
 				ballCount++;
 				//LCD_setScreen(0); 
 				drawBoard(); 
+				int win = checkWinner();
+				if(win>0){
+					 sprintf(String, " Win: %u ", win);
+					 UART_putstring(String);
+					 LCD_drawString(40,110, "Winner",65535,0);
+				 }
 				//LCD_drawCircle(40,40,5,65535);
 			}
 			else{
@@ -240,6 +256,12 @@ int main(void)
 				ballCount++;
 				//LCD_setScreen(0); 
 				drawBoard(); 
+				int win = checkWinner();
+				if(win>0){
+					 sprintf(String, " Win: %u ", win);
+					 UART_putstring(String);
+					 LCD_drawString(40,110, "Winner",65535,0);
+				 }
 				//LCD_drawCircle(50,50,5,65535);
 			}
 			else{

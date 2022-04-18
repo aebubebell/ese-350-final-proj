@@ -254,10 +254,10 @@ int setCell(int r, int c, int val){
 			for(int row = 0; row < 5; row++){
 				for(int col = 0; col < 5; col++){
 					if(board[row][col] == 1){
-						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 65535);
+						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 0xF800);
 					}
 					else if(board[row][col] == 2){
-						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 25000);
+						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 0xFFE0);
 					}
 				}
 			}
