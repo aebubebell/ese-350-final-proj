@@ -25,6 +25,9 @@ int overflowCount = 0;
 int ballCount = 0;
 int playerTurn = 1; 
 int cm = 0; 
+int player1Score = 0; 
+int player2Score = 0; 
+
 char String[25];
 
 void Initialize(){
@@ -44,8 +47,8 @@ void Initialize(){
 	PORTD |= (1<<PORTD7);
 	
 	
-	DDRD |= (1<<DDD6); //set PD6 as output pin for trigger signal
-	DDRB &= ~(1<<DDB0); //set PB0 as input pin for echo signal
+	DDRC |= (1<<DDC0); //set PD6 as output pin for trigger signal
+	//DDRB &= ~(1<<DDB0); //set PB0 as input pin for echo signal
 
 	
 	//set timer 1 to Normal Mode
@@ -132,6 +135,14 @@ int main(void){
 	
 }
 */
+void drawGrid(){
+	for(int row = 0; row < 5; row++){
+		for(int col = 0; col < 5; col++){
+			LCD_drawSquare(20*col + 20,20*row + 20,10,65535);
+		}
+	}
+}
+
 
 int main(void)
 {
@@ -142,6 +153,7 @@ int main(void)
 	lcd_init();
 	reset(); 
 	LCD_drawBlock(0,0,159,200,0);
+	drawGrid(); 
 	//LCD_drawCircle(20,20,5,65535);
 	sprintf(String, "Player 1's Turn! \n");
 	UART_putstring(String);
@@ -166,11 +178,19 @@ int main(void)
 				// LCD_setScreen(0); 
 				 drawBoard(); 
 				 int win = checkWinner();
-				 if(win>0){
-					 sprintf(String, " Win: %u ", win);
-					 UART_putstring(String);
-					 LCD_drawString(40,110, "Winner",65535,0);
-				 }
+				if(win==1){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player1Score++;
+				}
+				else if(win==2){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player2Score++;
+				}
+
 			//	LCD_drawCircle(10,10,5,65535);
 			 }
 			 else{
@@ -194,11 +214,19 @@ int main(void)
 				//LCD_drawCircle(20,20,5,65535);
 				ballCount++;
 				int win = checkWinner();
-				if(win>0){
-					 sprintf(String, " Win: %u ", win);
-					 UART_putstring(String);
-					 LCD_drawString(40,110, "Winner",65535,0);
-				 }
+				if(win==1){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player1Score++;
+				}
+				else if(win==2){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player2Score++;
+				}
+
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -216,11 +244,19 @@ int main(void)
 				drawBoard(); 
 				//LCD_drawCircle(30,30,5,65535);
 				int win = checkWinner();
-				if(win>0){
-					 sprintf(String, " Win: %u ", win);
-					 UART_putstring(String);
-					 LCD_drawString(40,110, "Winner",65535,0);
-				 }
+				if(win==1){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player1Score++;
+				}
+				else if(win==2){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player2Score++;
+				}
+
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -236,11 +272,19 @@ int main(void)
 				//LCD_setScreen(0); 
 				drawBoard(); 
 				int win = checkWinner();
-				if(win>0){
-					 sprintf(String, " Win: %u ", win);
-					 UART_putstring(String);
-					 LCD_drawString(40,110, "Winner",65535,0);
-				 }
+				if(win==1){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player1Score++;
+				}
+				else if(win==2){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player2Score++;
+				}
+
 				//LCD_drawCircle(40,40,5,65535);
 			}
 			else{
@@ -257,11 +301,19 @@ int main(void)
 				//LCD_setScreen(0); 
 				drawBoard(); 
 				int win = checkWinner();
-				if(win>0){
-					 sprintf(String, " Win: %u ", win);
-					 UART_putstring(String);
-					 LCD_drawString(40,110, "Winner",65535,0);
-				 }
+				if(win==1){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player1Score++;
+				}
+				else if(win==2){
+					sprintf(String, " Win: %u ", win);
+					UART_putstring(String);
+					LCD_drawString(40,110, "Winner",65535,0);
+					player2Score++;
+				}
+
 				//LCD_drawCircle(50,50,5,65535);
 			}
 			else{
@@ -317,8 +369,8 @@ ISR(TIMER1_CAPT_vect){
 ISR(TIMER1_OVF_vect){
 
 	overflowCount++;
-	PORTD |= (1<<PORTD6);
+	PORTD |= (1<<PORTC0);
 	_delay_us(20);
-	PORTD &= ~(1<<PORTD6);
+	PORTD &= ~(1<<PORTC0);
 
 }

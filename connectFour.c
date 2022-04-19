@@ -35,7 +35,7 @@ void reset(){
 		board[i][j] = 0;  
     }
   }
-
+	placeMines(3);
   }
   //add random mines on the board, if a ball lands in this slot then it switches to the opposing teams color 
   //also need to implement bonus ball feature if player throws from far enough   
@@ -43,14 +43,17 @@ void reset(){
 
 void placeMines(int numMines){
 	int minesUsed = 0; 
-	while(numMines < minesUsed){
-		int row = rand() % (5 + 1 - 0) + 0;
-		int col = rand() % (5 + 1 - 0) + 0;
+	board[4][0] = 3; 
+	board[4][1] = 3; 
+	/*
+	while(minesUsed < numMines){
+		int row = rand() % (4 + 1 - 0) + 0;
+		int col = rand() % (4 + 1 - 0) + 0;
 		if(board[row][col] == 0){
-			board[row][col] = 4;
+			board[row][col] = 3;
 			minesUsed++;
 		}
-	}
+	} */ 
 }
 
 
@@ -114,13 +117,21 @@ int setCell(int r, int c, int val){
     
     //drops the chip in and stacks them 
      int playTurn(int c) {
-        if (board[0][c] != 0 || gameOver) {
+        if ((board[0][c] == 1) || (board[0][c] == 2) || gameOver) { // != 0 
             return 0;
         }
+//		 if (board[0][c] != 0 || gameOver) { // != 0
+//	              return 0;
+//	         }
 
         if (player1 == 1) {
            int row,col;
             for (row = sizeof(board) - 1; row >= 0; row--) {
+				if(board[row][c] == 3){
+					board[row][c] = 2; 
+					LCD_drawString(40,10, "You hit a mine!",65535,0);
+					break; 
+				}
                 if (board[row][c] == 0) {
                     board[row][c] = 1;
                     break;
@@ -130,7 +141,12 @@ int setCell(int r, int c, int val){
         } else {
           int row,col;
             for ( row = sizeof(board) - 1; row >= 0; row--) {
-                if (board[row][c] == 0) {
+				if(board[row][c] == 3){
+					board[row][c] = 1;
+					LCD_drawString(40,10, "You hit a mine!",65535,0);
+					break; 
+				}
+                 if (board[row][c] == 0) {
                     board[row][c] = 2;
                     break;
                 }
@@ -254,13 +270,14 @@ int setCell(int r, int c, int val){
 			for(int row = 0; row < 5; row++){
 				for(int col = 0; col < 5; col++){
 					if(board[row][col] == 1){
-						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 0xF800);
+						LCD_drawCircle(20*col + 20, 20*row + 20, 5, 0xF800);
 					}
 					else if(board[row][col] == 2){
-						LCD_drawCircle(10*col + 20, 10*row + 20, 5, 0xFFE0);
+						LCD_drawCircle(20*col + 20, 20*row + 20, 5, 0xFFE0);
 					}
 				}
 			}
 			
 			
 		}
+			
