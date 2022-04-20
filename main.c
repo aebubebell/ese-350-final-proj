@@ -47,7 +47,7 @@ void Initialize(){
 	PORTD |= (1<<PORTD7);
 	
 	
-	DDRC |= (1<<DDC0); //set PD6 as output pin for trigger signal
+	DDRC &= ~(1<<DDC0); //set PC0 as input pin for bonus distance signal
 	//DDRB &= ~(1<<DDB0); //set PB0 as input pin for echo signal
 
 	
@@ -160,15 +160,21 @@ int main(void)
 //	LCD_setScreen(0); 
 	while (1)
 	{
+	//	if(PINC & (1<<PINC0)){
+	//		sprintf(String, "Bonus Distance!");
+	//		UART_putstring(String);
+	//	}
 		
 		 if(!(PIND & (1<<PIND7))){
 			 _delay_ms(400);
 			 if(playTurn(0)==1){
+				 int curr = getCurrentPlayer(); 
+				 
 				 sprintf(String, "Ball scored in column 1 ");
 				 UART_putstring(String);
 				// int gameOver = getGameOver(); 
 				
-				 int curr = getCurrentPlayer(); 
+				 
 				 sprintf(String, " Current Player: %u ", curr);
 				 UART_putstring(String);
 				 // sprintf(String, " Game Over: %u ", gameOver);
@@ -189,6 +195,16 @@ int main(void)
 					UART_putstring(String);
 					LCD_drawString(40,110, "Winner",65535,0);
 					player2Score++;
+				}
+				else if(win==0){
+					if(PINC & (1<<PINC0)){
+						if(curr == 0){
+							setCurrentPlayer(1);
+						}
+						else if(curr == 1){
+							setCurrentPlayer(0);
+						}
+					}
 				}
 
 			//	LCD_drawCircle(10,10,5,65535);
@@ -226,6 +242,16 @@ int main(void)
 					LCD_drawString(40,110, "Winner",65535,0);
 					player2Score++;
 				}
+				else if(win==0){
+					if(PINC & (1<<PINC0)){
+						if(curr == 0){
+							setCurrentPlayer(1);
+						}
+						else if(curr == 1){
+							setCurrentPlayer(0);
+						}
+					}
+				}
 
 			}
 			else{
@@ -237,6 +263,7 @@ int main(void)
 		else if(!(PIND & (1<<PIND3))){
 			_delay_ms(400);
 			if(playTurn(2)==1){
+				int curr = getCurrentPlayer(); 
 				sprintf(String, "Ball scored in column 3 \n");
 				UART_putstring(String);
 				ballCount++;
@@ -256,7 +283,16 @@ int main(void)
 					LCD_drawString(40,110, "Winner",65535,0);
 					player2Score++;
 				}
-
+				else if(win==0){
+					if(PINC & (1<<PINC0)){
+						if(curr == 0){
+							setCurrentPlayer(1);
+						}
+						else if(curr == 1){
+							setCurrentPlayer(0);
+						}
+					}
+				}
 			}
 			else{
 				sprintf(String, "Unsuccessful move \n");
@@ -266,6 +302,7 @@ int main(void)
 		else if(!(PIND & (1<<PIND4))){
 			_delay_ms(400);
 			if(playTurn(3)==1){
+				int curr = getCurrentPlayer(); 
 				sprintf(String, "Ball scored in column 4 \n");
 				UART_putstring(String);
 				ballCount++;
@@ -284,6 +321,16 @@ int main(void)
 					LCD_drawString(40,110, "Winner",65535,0);
 					player2Score++;
 				}
+				else if(win==0){
+					if(PINC & (1<<PINC0)){
+						if(curr == 0){
+							setCurrentPlayer(1);
+						}
+						else if(curr == 1){
+							setCurrentPlayer(0);
+						}
+					}
+				}
 
 				//LCD_drawCircle(40,40,5,65535);
 			}
@@ -295,6 +342,7 @@ int main(void)
 		else if(!(PIND & (1<<PIND5))){
 			_delay_ms(400);
 			if(playTurn(4)==1){
+				int curr = getCurrentPlayer(); 
 				sprintf(String, "Ball scored in column 5 \n");
 				UART_putstring(String);
 				ballCount++;
@@ -312,6 +360,16 @@ int main(void)
 					UART_putstring(String);
 					LCD_drawString(40,110, "Winner",65535,0);
 					player2Score++;
+				}
+				else if(win==0){
+					if(PINC & (1<<PINC0)){
+						if(curr == 0){
+							setCurrentPlayer(1);
+						}
+						else if(curr == 1){
+							setCurrentPlayer(0);
+						}
+					}
 				}
 
 				//LCD_drawCircle(50,50,5,65535);

@@ -43,7 +43,7 @@ void reset(){
 
 void placeMines(int numMines){
 	int minesUsed = 0; 
-	board[4][0] = 3; 
+	//board[4][0] = 3; 
 	board[4][1] = 3; 
 	/*
 	while(minesUsed < numMines){
@@ -67,6 +67,10 @@ void placeMines(int numMines){
      int getCurrentPlayer() {
         return player1;
     }
+	void setCurrentPlayer(int player){
+		player1 = player; 
+	}
+	
     
     /*
       getCell is a getter for the contents of the
