@@ -36,6 +36,8 @@ void reset(){
     }
   }
 	placeMines(3);
+	numTurns = 0; 
+	
   }
   //add random mines on the board, if a ball lands in this slot then it switches to the opposing teams color 
   //also need to implement bonus ball feature if player throws from far enough   
@@ -44,8 +46,8 @@ void reset(){
 void placeMines(int numMines){
 	int minesUsed = 0; 
 	//board[4][0] = 3; 
-	board[4][1] = 3; 
-	/*
+//	board[4][1] = 3; 
+	
 	while(minesUsed < numMines){
 		int row = rand() % (4 + 1 - 0) + 0;
 		int col = rand() % (4 + 1 - 0) + 0;
@@ -53,7 +55,7 @@ void placeMines(int numMines){
 			board[row][col] = 3;
 			minesUsed++;
 		}
-	} */ 
+	}  
 }
 
 
@@ -133,7 +135,21 @@ int setCell(int r, int c, int val){
             for (row = sizeof(board) - 1; row >= 0; row--) {
 				if(board[row][c] == 3){
 					board[row][c] = 2; 
-					LCD_drawString(40,10, "You hit a mine!",65535,0);
+					//if(checkWinner() == 1){
+					//	LCD_drawString(120,50, "Winner!",65535,0);
+					//	LCD_drawString(120,65, "Yellow",65535,0);
+					//	int p2 = getPlayer2Score();
+					//	setPlayer2Score(p2+1);
+				//		reset();
+				//		setGameOver(0);
+				//		LCD_drawBlock(0,0,159,200,0);
+				//		drawGrid();
+				//		drawScore();
+				//	}
+			//		LCD_drawString(40,10, "You hit a mine!",65535,0);
+					PORTC |= (1<<PORTC5);
+					 _delay_ms(80);
+					 PORTC &= ~(1<<PORTC5);
 					break; 
 				}
                 if (board[row][c] == 0) {
@@ -147,7 +163,22 @@ int setCell(int r, int c, int val){
             for ( row = sizeof(board) - 1; row >= 0; row--) {
 				if(board[row][c] == 3){
 					board[row][c] = 1;
-					LCD_drawString(40,10, "You hit a mine!",65535,0);
+				//	if(checkWinner() == 2){
+				//		LCD_drawString(120,50, "Winner!",65535,0);
+				//		LCD_drawString(120,65, "Red",65535,0);
+				//		int p1 = getPlayer1Score(); 
+				//		setPlayer2Score(p1+1);
+				//		reset();
+				//		setGameOver(0);
+				//		LCD_drawBlock(0,0,159,200,0);
+				//		drawGrid();
+				//		drawScore(); 
+					//	player1Score++; 
+				//	}
+				//	LCD_drawString(40,10, "You hit a mine!",65535,0);
+					PORTC |= (1<<PORTC5);
+					_delay_ms(80);
+					PORTC &= ~(1<<PORTC5);
 					break; 
 				}
                  if (board[row][c] == 0) {
@@ -167,14 +198,14 @@ int setCell(int r, int c, int val){
         }
 */ 
         numTurns++;
-        if (checkWinner() == 0) {
+       // if (checkWinner() == 0) {
             if(player1 == 1){
 				player1 = 0;
 			}
 			else{
 				player1 = 1;
 			}
-        }
+    //    }
        
         //storedState.add(numTurns, x);
         return 1;
@@ -190,13 +221,13 @@ int setCell(int r, int c, int val){
      int checkWinner() {
        int row,col;
          //Check horizontal win
-        for ( row = 0; row < sizeof(board); row++) {
-            for ( col = 0;col < sizeof(board[0]) - 3;col++) {
-                if (board[row][col] != 0 && board[row][col] == board[row][col + 1] && 
-                    board[row][col] == board[row][col + 2] &&
-                    board[row][col] == board[row][col + 3]) {
+        for ( row = 0; row < 5; row++) {
+            for ( col = 0;col < 2; col++) {
+                if ((board[row][col] != 0) && (board[row][col] == board[row][col + 1]) && 
+                    (board[row][col] == board[row][col + 2]) &&
+                    (board[row][col] == board[row][col + 3])) {
                     gameOver = 1;
-                    if (player1) {
+                    if (board[row][col] == 1) {
                         return 1;
                     } else {
                         return 2;
@@ -213,7 +244,7 @@ int setCell(int r, int c, int val){
                     board[row + 2][col] == board[row][col] &&
                     board[row + 3][col] == board[row][col]) {
                     gameOver = 1;
-                    if (player1) {
+                    if (board[row][col] == 1) {
                         return 1;
                     } else {
                         return 2;
@@ -221,48 +252,102 @@ int setCell(int r, int c, int val){
                 }
             }           
         } 
-        
-        
+        /*
+		if(board[1][0] != 0 && (board[1][0] == board[2][1]) && (board[1][0] == board[3][2]) && (board[1][0] == board[4][3])){
+			  if (board[1][0] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[0][0] != 0 && (board[0][0] == board[1][1]) && (board[0][0] == board[2][2]) && (board[0][0] == board[3][3])){
+			  if (board[0][0] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[1][1] != 0 && (board[1][1] == board[2][2]) && (board[1][1] == board[3][3]) && (board[1][1] == board[4][4])){
+			  if (board[1][1] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[0][1] != 0 && (board[0][1] == board[1][2]) && (board[0][1] == board[2][3]) && (board[0][1] == board[3][4])){
+			  if (board[0][1] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[3][0] != 0 && (board[3][0] == board[2][1]) && (board[3][0] == board[1][2]) && (board[3][0] == board[0][3])){
+			  if (board[3][0] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[4][0] != 0 && (board[4][0] == board[3][1]) && (board[4][0] == board[2][2]) && (board[4][0] == board[1][3])){
+			  if (board[4][0] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[3][1] != 0 && (board[3][1] == board[2][2]) && (board[3][1] == board[1][3]) && (board[3][1] == board[0][4])){
+			  if (board[3][1] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+		if(board[4][1] != 0 && (board[4][1] == board[3][2]) && (board[4][1] == board[2][3]) && (board[4][1] == board[1][4])){
+			  if (board[4][1] == 1) {
+				  return 1;
+				  } else {
+				  return 2;
+			  }
+		}
+        */ 
         //check diagonal downward win
-        for (int row = 0; row < sizeof(board) - 3; row++) {
-            for (int col = 0; col < sizeof(board[0]) - 3; col++) {
-                if (board[row][col] != 0 && 
-                    board[row][col] == board[row + 1][col + 1] 
-                            && 
-                    board[row + 1][col + 1] == board[row + 2][col + 2] &&
-                    board[row + 2][col + 2] == board[row + 3][col + 3] 
-                    ) {
+        for (int row = 0; row < 2; row++) {
+            for (int col = 0; col < 2; col++) {
+                if ((board[row][col] != 0) && 
+                    (board[row][col] == board[row + 1][col + 1]) && 
+                    (board[row + 1][col + 1] == board[row + 2][col + 2]) &&
+                    (board[row + 2][col + 2] == board[row + 3][col + 3])) {
                     gameOver = 1;
-                    if (player1) {
+                    if (board[row][col] == 1) {
                         return 1;
                     } else {
                         return 2;
                     }
-                }
+					}
             }
         }
         
       //check upward diagonal
-        for (int row = 3; row < sizeof(board); row++) {
-            for (int col = 0; col < sizeof(board[0]) - 3; col++) {
-                if (board[row][col] != 0 && 
-                    board[row][col] == board[row - 1][col + 1] && 
-                    board[row - 1][col + 1] == board[row - 2][col + 2] &&
-                    board[row - 2][col + 2] == board[row - 3][col + 3]) {         
+        for (int row = 3; row < 5; row++) {
+            for (int col = 0; col < 2; col++) {
+                if ((board[row][col] != 0) && 
+                    (board[row][col] == board[row - 1][col + 1]) && 
+                    (board[row - 1][col + 1] == board[row - 2][col + 2]) &&
+                    (board[row - 2][col + 2] == board[row - 3][col + 3])) {         
                     gameOver = 1;
-                    if (player1) {
+                    if (board[row][col] == 1) {
                         return 1;
                     } else {
                         return 2;
                     }
                 }
             }
-        }
-        
+			}
+       
        
 
         
-        if (numTurns >= 42) {
+        if (numTurns >= 25) {
             gameOver = 1;
             return 3;
         } else {
@@ -274,10 +359,10 @@ int setCell(int r, int c, int val){
 			for(int row = 0; row < 5; row++){
 				for(int col = 0; col < 5; col++){
 					if(board[row][col] == 1){
-						LCD_drawCircle(20*col + 20, 20*row + 20, 5, 0xF800);
+						LCD_drawCircle(20*col + 20, 20*row + 25, 5, 0xF800);
 					}
 					else if(board[row][col] == 2){
-						LCD_drawCircle(20*col + 20, 20*row + 20, 5, 0xFFE0);
+						LCD_drawCircle(20*col + 20, 20*row + 25, 5, 0xFFE0);
 					}
 				}
 			}
